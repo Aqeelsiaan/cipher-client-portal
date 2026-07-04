@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Dashboard - CIPHER</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <div class="topbar">
+    <div class="topbar-title" id="biz-name">Dashboard</div>
+    <button class="icon-btn" onclick="API.logout()" title="Sign out">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+    </button>
+  </div>
+
+  <div class="main" id="main">
+    <div class="skeleton-wrap">
+      <div class="skel" style="height:64px;border-radius:12px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <div class="skel" style="height:80px;border-radius:12px;"></div>
+        <div class="skel" style="height:80px;border-radius:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html"        class="nav-item active">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+    </a>
+    <a href="leads.html"        class="nav-item">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Leads
+    </a>
+    <a href="settings.html"     class="nav-item">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Bot
+    </a>
+    <a href="notifications.html" class="nav-item" id="notif-nav">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>Alerts
+    </a>
+  </nav>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+if (!requireAuth()) throw 0
+
+async function load() {
+  const data = await API.me()
+
+  document.getElementById('biz-name').textContent = data.business_name || 'Dashboard'
+  if (data.unread_notifications > 0) {
+    const n = document.getElementById('notif-nav')
+    n.innerHTML += `<span class="badge">${data.unread_notifications}</span>`
+  }
+
+  const main = document.getElementById('main')
+  main.innerHTML = `
+    <div class="card status-card">
+      <span class="dot ${data.bot_online ? 'dot-green' : 'dot-red'}"></span>
+      <div>
+        <div style="font-weight:600">Bot ${data.bot_online ? 'Online' : 'Offline'}</div>
+        <div class="sub">${data.bot_online ? 'Responding to messages' : 'Not connected - check your device'}</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:10px">
+      <div class="card">
+        <div class="card-label">Leads today</div>
+        <div class="card-num">${data.leads_today}</div>
+        <div class="sub">new contacts</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Alerts</div>
+        <div class="card-num">${data.unread_notifications}</div>
+        <div class="sub">unread</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px">
+      <div class="section-label">Quick actions</div>
+      ${action('/settings.html','🤖','Edit Bot Settings','Change services, prices, hours, persona')}
+      ${action('/leads.html','👥','View Leads','All contacts captured by your bot')}
+      ${action('/notifications.html','🔔','Notifications',data.unread_notifications > 0 ? `${data.unread_notifications} unread alert${data.unread_notifications>1?'s':''}` : 'No new alerts')}
+    </div>
+
+    ${data.license_key ? `
+    <div class="card" style="margin-top:10px;display:flex;align-items:center;gap:10px;padding:12px 14px">
+      <span style="font-size:18px">🔑</span>
+      <div style="min-width:0">
+        <div class="sub">License key</div>
+        <div style="font-size:13px;font-family:monospace;word-break:break-all">${data.license_key}</div>
+      </div>
+    </div>` : ''}
+
+    ${data.expires_at ? `
+    <div class="card" style="margin-top:8px;display:flex;align-items:center;gap:10px;padding:12px 14px">
+      <span style="font-size:18px">📅</span>
+      <div>
+        <div class="sub">License expires</div>
+        <div style="font-size:14px;font-weight:500">${data.expires_at.slice(0,10)}</div>
+      </div>
+    </div>` : ''}
+  `
+}
+
+function action(href, icon, title, sub) {
+  return `<a href="${href}" style="text-decoration:none;display:block;margin-bottom:8px">
+    <div class="card" style="display:flex;align-items:center;gap:14px;padding:14px 16px">
+      <span style="font-size:22px">${icon}</span>
+      <div><div style="font-weight:500">${title}</div><div class="sub">${sub}</div></div>
+      <span style="margin-left:auto;color:var(--text3)">›</span>
+    </div>
+  </a>`
+}
+
+load().catch(e => {
+  if (e?.message === 'UNAUTHORIZED') return // redirect to /login.html already in flight
+  document.getElementById('main').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Couldn't load dashboard</div><div class="empty-sub">Check your connection and try again.</div></div>`
+})
+</script>
+</body>
+</html>

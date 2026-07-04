@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f0f">
+<title>Bot Settings - CIPHER</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <div class="topbar">
+    <a href="index.html" class="icon-btn"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></a>
+    <div class="topbar-title">Bot Settings</div>
+  </div>
+
+  <div class="main" id="main">
+    <div class="skeleton-wrap">
+      <div class="skel" style="height:40px;border-radius:8px;"></div>
+      <div class="skel" style="height:100px;border-radius:12px;margin-top:10px;"></div>
+      <div class="skel" style="height:80px;border-radius:12px;margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div class="save-bar" id="save-bar" style="display:none">
+    <button class="btn btn-primary" id="save-btn" onclick="saveConfig()">Save changes</button>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html"         class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</a>
+    <a href="leads.html"         class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Leads</a>
+    <a href="settings.html"      class="nav-item active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Bot</a>
+    <a href="notifications.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>Alerts</a>
+  </nav>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+if (!requireAuth()) throw 0
+
+// ── Templates & service presets (same as admin panel) ────────────────────
+const TEMPLATES = {
+  gym:{open:'6:00 AM',close:'10:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Monthly Membership','Personal Training','Group Classes','Zumba','Yoga'],pricing:{'Monthly Membership':'3000','Personal Training':'5000'},catalog:[],faqs:[{q:'Free trial?',a:'Haan, pehle din free.'},{q:'Lockers?',a:'Available hain.'}],persona:'Friendly gym trainer ki tarah baat karo.'},
+  salon:{open:'10:00 AM',close:'9:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['Haircut','Hair Color','Facial','Threading','Manicure','Bridal Makeup'],pricing:{'Haircut':'500','Facial':'1500','Bridal Makeup':'15000'},catalog:[],faqs:[{q:'Appointment?',a:'Pehle book karo.'},{q:'Home service?',a:'Bridal ke liye available.'}],persona:'Professional beauty expert ki tarah guide karo.'},
+  restaurant:{open:'12:00 PM',close:'12:00 AM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['Dine In','Takeaway','Home Delivery'],pricing:{},catalog:[{name:'Chicken Burger',price:'350',desc:'Crispy'},{name:'Zinger Wrap',price:'280',desc:'Spicy'},{name:'Fries',price:'150',desc:'Golden'}],faqs:[{q:'Delivery?',a:'5km free Rs500+.'},{q:'Min order?',a:'Rs 500.'}],persona:'Helpful waiter ki tarah jaldi jawab do.'},
+  clinic:{open:'9:00 AM',close:'5:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Consultation','Blood Tests','X-Ray','ECG'],pricing:{'Consultation':'800','Blood Tests':'1500'},catalog:[],faqs:[{q:'Appointment?',a:'WhatsApp pe.'},{q:'Emergency?',a:'Walk-in accepted.'}],persona:'Professional medical staff ki tarah helpful raho.'},
+  pharmacy:{open:'9:00 AM',close:'10:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['Prescription Medicines','OTC Medicines','Home Delivery'],pricing:{'Home Delivery':'50'},catalog:[],faqs:[{q:'Delivery?',a:'3km tak.'},{q:'Prescription?',a:'Scheduled drugs ke liye zaroori.'}],persona:'Professional pharmacist ki tarah guide karo.'},
+  clothing:{open:'11:00 AM',close:'9:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['Ready-to-Wear','Custom Stitching','Bridal','Kids','Men','Women'],pricing:{},catalog:[{name:'Lawn Suit',price:'2500',desc:'3-piece'},{name:'Kids Frock',price:'1200',desc:'2–12 yrs'}],faqs:[{q:'Stitching?',a:'5-7 din normal.'},{q:'Exchange?',a:'7 din mein.'}],persona:'Fashion-savvy boutique assistant ki tarah guide karo.'},
+  realestate:{open:'10:00 AM',close:'7:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Sale','Rent','Commercial','Site Visit','Valuation'],pricing:{'Commission Sale':'2%','Commission Rent':'1 month'},catalog:[],faqs:[{q:'Site visit?',a:'Mon–Sat appointment pe.'},{q:'Commission?',a:'Sale 2%, rent 1 mahine.'}],persona:'Professional real estate agent ki tarah guide karo.'},
+  bakery:{open:'8:00 AM',close:'10:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['Fresh Baked','Custom Cakes','Wedding Cakes','Cupcakes'],pricing:{},catalog:[{name:'Custom Cake 1kg',price:'2500',desc:'3 din advance'},{name:'Wedding Cake',price:'15000',desc:'1 week advance'}],faqs:[{q:'Advance?',a:'Normal 2-3 din.'},{q:'Delivery?',a:'Rs 200, 5km.'}],persona:'Warm bakery assistant ki tarah friendly raho.'},
+  grocery:{open:'8:00 AM',close:'11:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['In-Store','Home Delivery','WhatsApp Orders','Bulk'],pricing:{'Delivery below Rs1000':'50','Above Rs1000':'Free'},catalog:[],faqs:[{q:'Min delivery?',a:'Rs 500.'},{q:'Monthly?',a:'Haan, list bhejein.'}],persona:'Quick grocery assistant ki tarah jawab do.'},
+  auto:{open:'9:00 AM',close:'7:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Engine Service','Oil Change','Tyre Change','AC Repair','Brakes','Denting'],pricing:{'Oil Change 1000cc':'1500','Full Service':'3500'},catalog:[],faqs:[{q:'Appointment?',a:'Better hai.'},{q:'Time?',a:'Oil 30min, service 2-3 hrs.'}],persona:'Honest mechanic ki tarah guide karo.'},
+  electronics:{open:'10:00 AM',close:'9:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['Mobile Repair','Laptop Repair','Screen Replace','Battery','Data Recovery'],pricing:{'iPhone Screen':'5000','Battery':'800'},catalog:[],faqs:[{q:'Repair time?',a:'Screen same day.'},{q:'Warranty?',a:'Parts 3 months.'}],persona:'Trustworthy tech expert ki tarah guide karo.'},
+  dental:{open:'10:00 AM',close:'6:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Checkup','Cleaning','Filling','Extraction','Braces','Root Canal','Eye Checkup'],pricing:{'Checkup':'500','Cleaning':'2000','Filling':'1500'},catalog:[],faqs:[{q:'Appointment?',a:'Same day possible.'},{q:'Anesthesia?',a:'Extraction mein.'}],persona:'Reassuring dental assistant ki tarah guide karo.'},
+  catering:{open:'9:00 AM',close:'8:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['Wedding Catering','Corporate','Birthday','BBQ'],pricing:{'Dinner per head':'1500','Full package':'2500'},catalog:[],faqs:[{q:'Min guests?',a:'50 pax.'},{q:'Advance?',a:'Wedding 2-4 weeks.'}],persona:'Experienced catering manager ki tarah guide karo.'},
+  shop:{open:'10:00 AM',close:'10:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['In-Store','Online','Home Delivery','COD','Bulk'],pricing:{},catalog:[],faqs:[{q:'Return?',a:'7 din mein.'},{q:'Delivery?',a:'1-2 working days.'}],persona:'Helpful shopkeeper ki tarah honest raho.'},
+  academy:{open:'2:00 PM',close:'9:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Matric Tuition','FSC','English Speaking','Computer Course','IELTS'],pricing:{'Matric':'3000','FSC':'3500','IELTS':'5000'},catalog:[],faqs:[{q:'Trial?',a:'Pehli class free.'},{q:'Online?',a:'Zoom pe bhi.'}],persona:'Encouraging teacher ki tarah guide karo.'},
+  general:{open:'9:00 AM',close:'6:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Our Services'],pricing:{},catalog:[],faqs:[{q:'Contact?',a:'WhatsApp ya call karo.'}],persona:'Friendly aur helpful raho.'},
+}
+const TYPE_SERVICES = {
+  gym:['Monthly Membership','Quarterly Plan','Annual Plan','Personal Training','Group Classes','Zumba','Yoga','CrossFit'],
+  salon:['Haircut','Hair Color','Facial','Threading','Waxing','Manicure','Pedicure','Bridal Makeup'],
+  restaurant:['Dine In','Takeaway','Home Delivery','Catering','Pre-Order'],
+  clinic:['Consultation','Specialist','Blood Tests','X-Ray','ECG','Ultrasound','Physiotherapy'],
+  pharmacy:['Prescription Medicines','OTC Medicines','Equipment','Injections','Vitamins','Home Delivery'],
+  clothing:['Ready-to-Wear','Custom Stitching','Bridal','Kids Wear','Men\'s Wear','Women\'s Wear','Alterations'],
+  realestate:['Sale','Rent','Commercial','Site Visit','Valuation','New Projects'],
+  bakery:['Fresh Baked','Custom Cakes','Wedding Cakes','Cupcakes','Pastries','Catering'],
+  grocery:['In-Store','Home Delivery','WhatsApp Orders','Bulk Orders','Monthly Package'],
+  auto:['Engine Service','Oil Change','Tyre Change','AC Repair','Brakes','Denting & Painting','Car Wash'],
+  electronics:['Mobile Repair','Laptop Repair','Screen Replace','Battery Replace','Data Recovery'],
+  dental:['Checkup','Cleaning','Filling','Extraction','Braces','Root Canal','Eye Checkup','Glasses'],
+  catering:['Wedding Catering','Corporate','Birthday','Dawat Package','BBQ','Dessert Table'],
+  shop:['In-Store','Online','Home Delivery','COD','Bulk Orders'],
+  academy:['Matric','FSC','English Speaking','Computer Course','IELTS','O-Level','A-Level'],
+  general:['Service 1','Service 2'],
+}
+
+let _cfg = {}, _currentType = ''
+
+// ── Build UI from saved config ────────────────────────────────────────────
+async function load() {
+  const { config } = await API.getConfig()
+  _cfg = config || {}
+  renderForm(_cfg)
+  document.getElementById('save-bar').style.display = ''
+}
+
+function renderForm(c) {
+  const main = document.getElementById('main')
+  main.innerHTML = `
+    <div class="form-group">
+      <label>Business name</label>
+      <input type="text" id="f_biz_name" value="${esc(c.business_name||'')}" placeholder="Your business name">
+    </div>
+    <div class="form-group">
+      <label>Reply language</label>
+      <select id="f_lang">
+        <option value="roman"   ${(c.language||'roman')==='roman'   ?'selected':''}>Roman Urdu / Hinglish</option>
+        <option value="english" ${c.language==='english'?'selected':''}>English</option>
+        <option value="urdu"    ${c.language==='urdu'   ?'selected':''}>اردو</option>
+      </select>
+    </div>
+
+    <div class="section-label">Business type</div>
+    <div id="type-btns" style="display:flex;flex-wrap:wrap;gap:6px;">
+      ${[['gym','🏋️ Gym'],['salon','💇 Salon'],['restaurant','🍔 Restaurant'],['clinic','🏥 Clinic'],
+         ['pharmacy','💊 Pharmacy'],['clothing','👗 Clothing'],['realestate','🏠 Real Estate'],
+         ['bakery','🎂 Bakery'],['grocery','🛒 Grocery'],['auto','🔧 Auto'],['electronics','📱 Electronics'],
+         ['dental','🦷 Dental'],['catering','🍽️ Catering'],['shop','🛍️ Retail'],['academy','📚 Academy'],['general','🏢 Other']]
+        .map(([k,l])=>`<button type="button" class="type-btn ${c.business_type===k?'active':''}" onclick="selectType('${k}')">${l}</button>`).join('')}
+    </div>
+
+    <div class="section-label">Working hours</div>
+    <div class="hours-row">
+      <select id="f_open">${timeOptions(c)}</select>
+      <span style="color:var(--text2)">to</span>
+      <select id="f_close">${closeOptions(c)}</select>
+    </div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px" id="day-btns">
+      ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>{
+        const on = isDayOn(c.working_hours||'', d)
+        return `<button type="button" class="day-btn ${on?'on':''}" data-d="${d}" onclick="this.classList.toggle('on')">${d}</button>`
+      }).join('')}
+    </div>
+
+    <div class="section-label">Services</div>
+    <div id="svc-chips" style="margin-bottom:10px"></div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="svc-inp" placeholder="Add custom service" style="flex:1">
+      <button type="button" class="btn-ghost btn" style="padding:8px 14px;font-size:13px" onclick="addCustomService()">Add</button>
+    </div>
+
+    <div class="section-label">Pricing</div>
+    <div id="price-rows"></div>
+    <button type="button" class="add-btn" onclick="addPriceRow('','')">+ Add price</button>
+
+    <div class="section-label">Menu / Catalog</div>
+    <div id="catalog-cards"></div>
+    <button type="button" class="add-btn" onclick="addCatalogCard('','','')">+ Add item</button>
+
+    <div class="section-label">FAQs</div>
+    <div id="faq-cards"></div>
+    <button type="button" class="add-btn" onclick="addFaq('','')">+ Add FAQ</button>
+
+    <div class="section-label">Bot personality</div>
+    <select id="persona-preset" onchange="setPersona(this.value)" style="width:100%;background:var(--elevated);border:1px solid var(--border);border-radius:8px;color:var(--text1);padding:10px 12px;font-size:14px;margin-bottom:8px">
+      <option value="">-- Choose a style --</option>
+      <option value="Ek friendly aur helpful assistant ki tarah jawab do.">Friendly &amp; Professional</option>
+      <option value="Ek experienced aur confident expert ki tarah guide karo.">Expert Advisor</option>
+      <option value="Hamesha jaldi aur seedha jawab do.">Quick &amp; Direct</option>
+      <option value="custom">Custom…</option>
+    </select>
+    <div id="persona-custom" style="display:none">
+      <textarea id="f_persona" rows="3" placeholder="Describe how the bot should talk…" oninput="_cfg._persona=this.value">${esc(c.ai_persona||'')}</textarea>
+    </div>
+
+    <div class="section-label">Extra knowledge</div>
+    <textarea id="f_kb" rows="4" placeholder="Address, special notes, anything extra the bot should know…">${esc(c.knowledge_base||c.faq||'')}</textarea>
+
+    <div style="height:80px"></div>
+  `
+
+  _currentType = c.business_type || ''
+  const svcs = Array.isArray(c.services) ? c.services : (c.services||'').split('\n').filter(Boolean)
+  const allSvcs = [...new Set([...(TYPE_SERVICES[_currentType]||[]), ...svcs])]
+  rebuildChips(allSvcs, svcs)
+  rebuildPriceRows(c.pricing||{})
+  ;(Array.isArray(c.catalog)?c.catalog:[]).forEach(i=>addCatalogCard(i.name,i.price,i.desc))
+  const kb = c.knowledge_base||c.faq||''
+  if(kb) { const faqs = kb.split(/Q:/i).filter(Boolean); faqs.forEach(f=>{ const [q,...a]=f.split(/\nA:/i); if(q&&a.length) addFaq(q.trim(), a.join('').trim()) }) }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;') }
+
+function isDayOn(hoursStr, day) {
+  if (!hoursStr) return false
+  if (hoursStr.includes('Daily')) return true
+  if (hoursStr.includes('Mon–Sat') && day !== 'Sun') return true
+  return hoursStr.includes(day)
+}
+
+function timeOptions(c) {
+  const open = (c.working_hours||'').match(/(\d+:\d+ [AP]M)/)?.[1]||'9:00 AM'
+  return ['6:00 AM','7:00 AM','8:00 AM','9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM']
+    .map(t=>`<option${t===open?' selected':''}>${t}</option>`).join('')
+}
+function closeOptions(c) {
+  const close = (c.working_hours||'').match(/– (\d+:\d+ [AP]M)/)?.[1]||'9:00 PM'
+  return ['5:00 PM','6:00 PM','7:00 PM','8:00 PM','9:00 PM','10:00 PM','11:00 PM','12:00 AM','1:00 AM']
+    .map(t=>`<option${t===close?' selected':''}>${t}</option>`).join('')
+}
+
+function selectType(type) {
+  _currentType = type
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active', b.textContent.toLowerCase().includes(type.split('')[0])||b.getAttribute('onclick').includes(`'${type}'`)))
+  const t = TEMPLATES[type]; if(!t) return
+  setHours(t.open, t.close, t.days)
+  rebuildChips(TYPE_SERVICES[type]||[], t.services)
+  rebuildPriceRows(t.pricing||{})
+  document.getElementById('catalog-cards').innerHTML=''
+  ;(t.catalog||[]).forEach(i=>addCatalogCard(i.name,i.price,i.desc))
+  document.getElementById('faq-cards').innerHTML=''
+  ;(t.faqs||[]).forEach(f=>addFaq(f.q,f.a))
+  document.getElementById('f_persona').value=t.persona
+  _cfg._persona=t.persona
+}
+
+function setHours(open, close, days) {
+  const os=document.getElementById('f_open'), cs=document.getElementById('f_close')
+  Array.from(os.options).forEach(o=>{if(o.value===open)os.value=open})
+  Array.from(cs.options).forEach(o=>{if(o.value===close)cs.value=close})
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.toggle('on', days.includes(b.dataset.d)))
+}
+
+function getHoursStr() {
+  const o=document.getElementById('f_open')?.value, c=document.getElementById('f_close')?.value
+  const days=[...document.querySelectorAll('.day-btn.on')].map(b=>b.dataset.d)
+  const ds=days.length===7?'Daily':days.join('-')==='Mon-Tue-Wed-Thu-Fri-Sat'?'Mon–Sat':days.join(', ')
+  return [o&&c?`${o} – ${c}`:'',ds].filter(Boolean).join(', ')
+}
+
+function rebuildChips(all, selected) {
+  const box=document.getElementById('svc-chips'); box.innerHTML=''
+  all.forEach(s=>addChip(s, selected.includes(s)))
+}
+function addChip(label, on) {
+  const box=document.getElementById('svc-chips')
+  const c=document.createElement('span')
+  c.className='svc-chip'+(on?' on':''); c.dataset.svc=label
+  c.innerHTML=label+' <span class="chip-x" onclick="event.stopPropagation();this.parentElement.remove();rebuildPriceFromChips()">✕</span>'
+  c.addEventListener('click',function(e){if(e.target.classList.contains('chip-x'))return;this.classList.toggle('on');rebuildPriceFromChips()})
+  box.appendChild(c)
+}
+function addCustomService() {
+  const i=document.getElementById('svc-inp'), v=i.value.trim(); if(!v)return
+  addChip(v,true); i.value=''; rebuildPriceFromChips()
+}
+function getSelectedSvcs() { return[...document.querySelectorAll('.svc-chip.on')].map(c=>c.dataset.svc) }
+
+function rebuildPriceRows(obj) {
+  document.getElementById('price-rows').innerHTML=''
+  Object.entries(obj).forEach(([k,v])=>addPriceRow(k,v))
+}
+function rebuildPriceFromChips() {
+  const box=document.getElementById('price-rows')
+  const existing={}
+  box.querySelectorAll('.price-row').forEach(r=>{const l=r.querySelector('.pl')?.value.trim(),a=r.querySelector('.pa')?.value.trim();if(l)existing[l]=a||''})
+  box.innerHTML=''
+  getSelectedSvcs().forEach(s=>addPriceRow(s,existing[s]||''))
+}
+function addPriceRow(label, val) {
+  const box=document.getElementById('price-rows')
+  const r=document.createElement('div'); r.className='price-row'
+  r.innerHTML=`<input class="pl" type="text" value="${esc(label)}" placeholder="Service name"><span style="color:var(--text2);font-size:13px">Rs</span><input class="pa" type="text" value="${esc(val)}" placeholder="0" style="max-width:90px"><button type="button" class="del-btn" onclick="this.parentElement.remove()">✕</button>`
+  box.appendChild(r)
+}
+function addCatalogCard(name,price,desc) {
+  const box=document.getElementById('catalog-cards')
+  const c=document.createElement('div'); c.className='catalog-card'
+  c.innerHTML=`<input type="text" class="cn" value="${esc(name)}" placeholder="Item name"><input type="text" class="cp" value="${esc(price)}" placeholder="Price (Rs)"><input type="text" class="cd" value="${esc(desc||'')}" placeholder="Description (optional)"><button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:12px">Remove</button>`
+  box.appendChild(c)
+}
+function addFaq(q,a) {
+  const box=document.getElementById('faq-cards')
+  const c=document.createElement('div'); c.className='faq-card'
+  c.innerHTML=`<input type="text" class="fq" value="${esc(q)}" placeholder="Question"><textarea class="fa" rows="2" placeholder="Answer">${esc(a)}</textarea><button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:12px">Remove</button>`
+  box.appendChild(c)
+}
+function setPersona(val) {
+  const show=val==='custom'
+  document.getElementById('persona-custom').style.display=show?'':'none'
+  if(!show&&val){document.getElementById('f_persona').value=val;_cfg._persona=val}
+}
+
+// ── Save ─────────────────────────────────────────────────────────────────
+async function saveConfig() {
+  const btn=document.getElementById('save-btn')
+  btn.disabled=true; btn.textContent='Saving…'
+
+  const services=getSelectedSvcs()
+  const pricing={}
+  document.querySelectorAll('#price-rows .price-row').forEach(r=>{
+    const l=r.querySelector('.pl')?.value.trim(),a=r.querySelector('.pa')?.value.trim()
+    if(l&&a) pricing[l]=a
+  })
+  const catalog=[...document.querySelectorAll('#catalog-cards .catalog-card')].map(c=>({
+    name:c.querySelector('.cn')?.value.trim()||'',
+    price:c.querySelector('.cp')?.value.trim()||'',
+    desc:c.querySelector('.cd')?.value.trim()||'',
+  })).filter(i=>i.name)
+  const faqs=[...document.querySelectorAll('#faq-cards .faq-card')].map(c=>({
+    q:c.querySelector('.fq')?.value.trim()||'',
+    a:c.querySelector('.fa')?.value.trim()||'',
+  })).filter(f=>f.q&&f.a)
+
+  // FAQs must be folded into knowledge_base, not a separate `faq` key - the
+  // server's allowlist only recognizes `knowledge_base` (api_client.py
+  // _ALLOWED_KEYS), and bot/ai.js only ever reads `config.knowledge_base ||
+  // config.faq`. Saving under a bare `faq` key meant every FAQ card was
+  // silently stripped on save with no error - "✅ Saved!" shown regardless.
+  const notes = document.getElementById('f_kb')?.value.trim()||''
+  const faqText = faqs.length ? faqs.map(f=>`Q: ${f.q}\nA: ${f.a}`).join('\n\n') : ''
+  const knowledge_base = [notes, faqText].filter(Boolean).join('\n\n')
+
+  const config={
+    business_name: document.getElementById('f_biz_name')?.value.trim()||'',
+    business_type: _currentType,
+    working_hours: getHoursStr(),
+    language: document.getElementById('f_lang')?.value||'roman',
+    services,
+    pricing,
+    catalog,
+    knowledge_base,
+    ai_persona: document.getElementById('f_persona')?.value||_cfg._persona||'',
+  }
+
+  try {
+    await API.saveConfig(config)
+    toast('✅ Saved! Bot updates within 5 minutes.')
+  } catch(e) {
+    toast('❌ ' + e.message)
+  }
+  btn.disabled=false; btn.textContent='Save changes'
+}
+
+load().catch(console.error)
+</script>
+</body>
+</html>

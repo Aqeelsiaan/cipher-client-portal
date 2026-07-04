@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f0f">
+<title>Leads - CIPHER</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <div class="topbar">
+    <a href="index.html" class="icon-btn">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </a>
+    <div class="topbar-title">Leads</div>
+    <a id="export-btn" href="#" class="icon-btn" title="Export CSV" style="color:var(--accent)">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+    </a>
+  </div>
+
+  <div class="main" id="main">
+    <div class="skeleton-wrap">
+      <div class="skel" style="height:60px;border-radius:12px;"></div>
+      <div class="skel" style="height:60px;border-radius:12px;"></div>
+      <div class="skel" style="height:60px;border-radius:12px;"></div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html"        class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</a>
+    <a href="leads.html"        class="nav-item active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Leads</a>
+    <a href="settings.html"     class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Bot</a>
+    <a href="notifications.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>Alerts</a>
+  </nav>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+if (!requireAuth()) throw 0
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;') }
+
+document.getElementById('export-btn').addEventListener('click', (e) => {
+  e.preventDefault()
+  API.downloadLeadsCsv().catch(() => toast('Export failed - try again'))
+})
+
+async function load() {
+  const { leads } = await API.getLeads()
+  const main = document.getElementById('main')
+
+  const count = leads.length
+  if (!count) {
+    main.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">No leads yet</div><div class="empty-sub">Once customers message your bot, they'll appear here.</div></div>`
+    return
+  }
+
+  // l.name / l.last_message are typed by arbitrary WhatsApp customers —
+  // must be escaped before going into innerHTML (was a stored-XSS hole:
+  // a customer could message a <script>/onerror payload as their name).
+  main.innerHTML = `<p style="font-size:13px;color:var(--text2);margin-bottom:14px">${count} contact${count !== 1 ? 's' : ''} captured</p>` +
+    leads.map(l => {
+      const initial = esc((l.name || '?')[0].toUpperCase())
+      const date = l.created_at ? esc(l.created_at.slice(0, 10)) : ''
+      return `
+      <div class="card" style="margin-bottom:8px;padding:12px 14px">
+        <div class="lead-card">
+          <div class="lead-avatar">${initial}</div>
+          <div class="lead-info">
+            <div class="lead-name">${esc(l.name || 'Unknown')}</div>
+            <div class="lead-phone">${esc(l.phone || l.jid || '')}</div>
+          </div>
+          <div class="lead-date">${date}</div>
+        </div>
+        ${l.last_message ? `<div class="lead-msg">"${esc(l.last_message)}"</div>` : ''}
+      </div>`
+    }).join('')
+}
+
+load().catch(e => {
+  if (e?.message === 'UNAUTHORIZED') return // redirect to /login.html already in flight
+  document.getElementById('main').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Couldn't load leads</div><div class="empty-sub">Check your connection and try again.</div></div>`
+})
+</script>
+</body>
+</html>
