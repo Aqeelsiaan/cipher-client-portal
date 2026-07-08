@@ -82,14 +82,14 @@ async function load() {
 
     <div style="margin-top:16px">
       <div class="section-label">Quick actions</div>
-      ${action('/settings.html','🤖','Edit Bot Settings','Change services, prices, hours, persona')}
-      ${action('/leads.html','👥','View Leads','All contacts captured by your bot')}
-      ${action('/notifications.html','🔔','Notifications',data.unread_notifications > 0 ? `${data.unread_notifications} unread alert${data.unread_notifications>1?'s':''}` : 'No new alerts')}
+      ${action('/settings.html', emoji('1f916',22), 'Edit Bot Settings','Change services, prices, hours, persona')}
+      ${action('/leads.html', emoji('1f465',22), 'View Leads','All contacts captured by your bot')}
+      ${action('/notifications.html', emoji('1f514',22), 'Notifications',data.unread_notifications > 0 ? `${data.unread_notifications} unread alert${data.unread_notifications>1?'s':''}` : 'No new alerts')}
     </div>
 
     ${data.license_key ? `
     <div class="card" style="margin-top:10px;display:flex;align-items:center;gap:10px;padding:12px 14px">
-      <span style="font-size:18px">🔑</span>
+      <span>${emoji('1f511',18)}</span>
       <div style="min-width:0">
         <div class="sub">License key</div>
         <div style="font-size:13px;font-family:monospace;word-break:break-all">${data.license_key}</div>
@@ -98,7 +98,7 @@ async function load() {
 
     ${data.expires_at ? `
     <div class="card" style="margin-top:8px;display:flex;align-items:center;gap:10px;padding:12px 14px">
-      <span style="font-size:18px">📅</span>
+      <span>${emoji('1f4c5',18)}</span>
       <div>
         <div class="sub">License expires</div>
         <div style="font-size:14px;font-weight:500">${data.expires_at.slice(0,10)}</div>
@@ -119,7 +119,7 @@ function action(href, icon, title, sub) {
 
 load().catch(e => {
   if (e?.message === 'UNAUTHORIZED') return // redirect to /login.html already in flight
-  document.getElementById('main').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Couldn't load dashboard</div><div class="empty-sub">Check your connection and try again.</div></div>`
+  document.getElementById('main').innerHTML = `<div class="empty"><div class="empty-icon">${emoji('26a0-fe0f',40)}</div><div class="empty-title">Couldn't load dashboard</div><div class="empty-sub">Check your connection and try again.</div></div>`
 })
 </script>
 </body>

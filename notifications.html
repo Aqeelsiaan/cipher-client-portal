@@ -41,7 +41,7 @@ async function load() {
   const main = document.getElementById('main')
 
   if (!notifications.length) {
-    main.innerHTML = `<div class="empty"><div class="empty-icon">🔔</div><div class="empty-title">All caught up</div><div class="empty-sub">You'll see alerts here when your bot goes offline, gets a new lead, or your license is expiring.</div></div>`
+    main.innerHTML = `<div class="empty"><div class="empty-icon">${emoji('1f514',40)}</div><div class="empty-title">All caught up</div><div class="empty-sub">You'll see alerts here when your bot goes offline, gets a new lead, or your license is expiring.</div></div>`
     return
   }
 
@@ -63,7 +63,7 @@ async function load() {
 }
 
 load().catch(() => {
-  document.getElementById('main').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Couldn't load notifications</div><div class="empty-sub">Check your connection and try again.</div></div>`
+  document.getElementById('main').innerHTML = `<div class="empty"><div class="empty-icon">${emoji('26a0-fe0f',40)}</div><div class="empty-title">Couldn't load notifications</div><div class="empty-sub">Check your connection and try again.</div></div>`
 })
 </script>
 </body>

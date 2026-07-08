@@ -53,7 +53,7 @@ async function load() {
 
   const count = leads.length
   if (!count) {
-    main.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">No leads yet</div><div class="empty-sub">Once customers message your bot, they'll appear here.</div></div>`
+    main.innerHTML = `<div class="empty"><div class="empty-icon">${emoji('1f465',40)}</div><div class="empty-title">No leads yet</div><div class="empty-sub">Once customers message your bot, they'll appear here.</div></div>`
     return
   }
 
@@ -81,7 +81,7 @@ async function load() {
 
 load().catch(e => {
   if (e?.message === 'UNAUTHORIZED') return // redirect to /login.html already in flight
-  document.getElementById('main').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Couldn't load leads</div><div class="empty-sub">Check your connection and try again.</div></div>`
+  document.getElementById('main').innerHTML = `<div class="empty"><div class="empty-icon">${emoji('26a0-fe0f',40)}</div><div class="empty-title">Couldn't load leads</div><div class="empty-sub">Check your connection and try again.</div></div>`
 })
 </script>
 </body>

@@ -105,11 +105,11 @@ function renderForm(c) {
 
     <div class="section-label">Business type</div>
     <div id="type-btns" style="display:flex;flex-wrap:wrap;gap:6px;">
-      ${[['gym','🏋️ Gym'],['salon','💇 Salon'],['restaurant','🍔 Restaurant'],['clinic','🏥 Clinic'],
-         ['pharmacy','💊 Pharmacy'],['clothing','👗 Clothing'],['realestate','🏠 Real Estate'],
-         ['bakery','🎂 Bakery'],['grocery','🛒 Grocery'],['auto','🔧 Auto'],['electronics','📱 Electronics'],
-         ['dental','🦷 Dental'],['catering','🍽️ Catering'],['shop','🛍️ Retail'],['academy','📚 Academy'],['general','🏢 Other']]
-        .map(([k,l])=>`<button type="button" class="type-btn ${c.business_type===k?'active':''}" onclick="selectType('${k}')">${l}</button>`).join('')}
+      ${[['gym','1f3cb-fe0f','Gym'],['salon','1f487','Salon'],['restaurant','1f354','Restaurant'],['clinic','1f3e5','Clinic'],
+         ['pharmacy','1f48a','Pharmacy'],['clothing','1f457','Clothing'],['realestate','1f3e0','Real Estate'],
+         ['bakery','1f382','Bakery'],['grocery','1f6d2','Grocery'],['auto','1f527','Auto'],['electronics','1f4f1','Electronics'],
+         ['dental','1f9b7','Dental'],['catering','1f37d-fe0f','Catering'],['shop','1f6cd-fe0f','Retail'],['academy','1f4da','Academy'],['general','1f3e2','Other']]
+        .map(([k,cp,l])=>`<button type="button" class="type-btn ${c.business_type===k?'active':''}" onclick="selectType('${k}')">${emoji(cp,16)} ${l}</button>`).join('')}
     </div>
 
     <div class="section-label">Working hours</div>

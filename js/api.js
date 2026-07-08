@@ -120,6 +120,11 @@ function requireAuth() {
   return true
 }
 
+// Apple-style emoji image instead of raw unicode glyphs (render inconsistently across OSes)
+function emoji(codepoint, size = 18) {
+  return `<img src="https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.0.1/img/apple/64/${codepoint}.png" alt="" style="width:${size}px;height:${size}px;vertical-align:-3px">`
+}
+
 // Shared toast
 function toast(msg, ms = 2500) {
   let t = document.getElementById('toast')
