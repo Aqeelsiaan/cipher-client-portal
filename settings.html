@@ -160,6 +160,15 @@ function renderForm(c) {
     <div class="section-label">Extra knowledge</div>
     <textarea id="f_kb" rows="4" placeholder="Address, special notes, anything extra the bot should know…">${esc(c.knowledge_base||c.faq||'')}</textarea>
 
+    <div class="section-label" style="margin-top:20px">Your data</div>
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px">
+      <div>
+        <div style="font-weight:500">Export my data</div>
+        <div class="sub">Download your bot settings and leads as files you can keep</div>
+      </div>
+      <button type="button" class="btn btn-ghost" onclick="exportMyData(this)">Export</button>
+    </div>
+
     <div style="height:80px"></div>
   `
 
@@ -274,6 +283,27 @@ function setPersona(val) {
   const show=val==='custom'
   document.getElementById('persona-custom').style.display=show?'':'none'
   if(!show&&val){document.getElementById('f_persona').value=val;_cfg._persona=val}
+}
+
+// ── Export ───────────────────────────────────────────────────────────────
+async function exportMyData(btn) {
+  btn.disabled = true; const label = btn.textContent; btn.textContent = 'Exporting…'
+  try {
+    const { config } = await API.getConfig()
+    const cfgBlob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' })
+    const cfgUrl = URL.createObjectURL(cfgBlob)
+    const a = document.createElement('a')
+    a.href = cfgUrl; a.download = 'cipher-bot-settings.json'
+    document.body.appendChild(a); a.click(); a.remove()
+    URL.revokeObjectURL(cfgUrl)
+
+    await API.downloadLeadsCsv()
+    toast('Downloaded settings + leads')
+  } catch (e) {
+    toast('Export failed - try again')
+  } finally {
+    btn.disabled = false; btn.textContent = label
+  }
 }
 
 // ── Save ─────────────────────────────────────────────────────────────────
