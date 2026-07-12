@@ -98,15 +98,7 @@ const API = (() => {
     async downloadLeadsCsv() {
       const r = await fetch(BASE + '/api/auth/leads/export', { headers: headers() })
       if (!r.ok) throw new Error('Export failed')
-      const blob = await r.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'cipher-leads.csv'
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      URL.revokeObjectURL(url)
+      downloadBlob(await r.blob(), 'cipher-leads.csv')
     },
   }
 })()
@@ -118,6 +110,18 @@ function requireAuth() {
     return false
   }
   return true
+}
+
+// Trigger a browser download for an in-memory blob (JSON export, CSV export, etc.)
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
 }
 
 // Apple-style emoji image instead of raw unicode glyphs (render inconsistently across OSes)

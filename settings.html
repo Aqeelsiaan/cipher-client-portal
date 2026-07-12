@@ -289,15 +289,8 @@ function setPersona(val) {
 async function exportMyData(btn) {
   btn.disabled = true; const label = btn.textContent; btn.textContent = 'Exporting…'
   try {
-    const { config } = await API.getConfig()
-    const cfgBlob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' })
-    const cfgUrl = URL.createObjectURL(cfgBlob)
-    const a = document.createElement('a')
-    a.href = cfgUrl; a.download = 'cipher-bot-settings.json'
-    document.body.appendChild(a); a.click(); a.remove()
-    URL.revokeObjectURL(cfgUrl)
-
-    await API.downloadLeadsCsv()
+    const [{ config }] = await Promise.all([API.getConfig(), API.downloadLeadsCsv()])
+    downloadBlob(new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' }), 'cipher-bot-settings.json')
     toast('Downloaded settings + leads')
   } catch (e) {
     toast('Export failed - try again')
