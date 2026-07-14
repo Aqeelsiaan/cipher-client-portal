@@ -27,7 +27,7 @@ const API = (() => {
     const r = await fetch(BASE + path, opts)
     if (r.status === 401) {
       clearToken()
-      location.href = '/login.html'
+      location.href = 'login.html'
       // Throw a recognizable error instead of returning undefined — callers
       // that do `const data = await API.x(); data.someField` would otherwise
       // hit a confusing "Cannot read properties of undefined" from THAT line
@@ -66,7 +66,7 @@ const API = (() => {
         return data
       })
     },
-    logout() { clearToken(); location.href = '/login.html' },
+    logout() { clearToken(); location.href = 'login.html' },
 
     forgotPassword(email) {
       return fetch(BASE + '/api/auth/forgot-password', {
@@ -106,7 +106,7 @@ const API = (() => {
 // Guard — call on every page except login.html
 function requireAuth() {
   if (!API.isLoggedIn()) {
-    location.href = '/login.html'
+    location.href = 'login.html'
     return false
   }
   return true
