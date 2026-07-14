@@ -57,6 +57,10 @@ const TEMPLATES = {
   catering:{open:'9:00 AM',close:'8:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['Wedding Catering','Corporate','Birthday','BBQ'],pricing:{'Dinner per head':'1500','Full package':'2500'},catalog:[],faqs:[{q:'Min guests?',a:'50 people.'},{q:'Advance booking?',a:'2-4 weeks for weddings.'}],persona:'Guide customers like an experienced catering manager.'},
   shop:{open:'10:00 AM',close:'10:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['In-Store','Online','Home Delivery','COD','Bulk'],pricing:{},catalog:[],faqs:[{q:'Return?',a:'Within 7 days.'},{q:'Delivery?',a:'1-2 working days.'}],persona:'Be honest and helpful like a shopkeeper.'},
   academy:{open:'2:00 PM',close:'9:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Matric Tuition','FSC','English Speaking','Computer Course','IELTS'],pricing:{'Matric':'3000','FSC':'3500','IELTS':'5000'},catalog:[],faqs:[{q:'Trial?',a:'First class is free.'},{q:'Online?',a:'Available via Zoom too.'}],persona:'Guide customers like an encouraging teacher.'},
+  furniture:{open:'10:00 AM',close:'8:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],services:['Bedroom Sets','Sofas','Office Furniture','Kids Furniture','Custom Orders'],pricing:{},catalog:[{name:'3-Seater Sofa',price:'35000',desc:'Sheesham wood, fabric or leather'}],faqs:[{q:'Custom orders?',a:'Yes, 2-3 weeks with 30% advance required.'}],persona:'Guide customers like a knowledgeable furniture showroom assistant.'},
+  travel:{open:'10:00 AM',close:'7:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Air Tickets','Visa Assistance','Hotel Booking','Tour Packages','Umrah Packages'],pricing:{},catalog:[{name:'Murree 3-Day Package',price:'25000',desc:'Hotel + transport'}],faqs:[{q:'Visa help?',a:'Yes, full visa assistance for popular destinations.'}],persona:'Guide customers like a knowledgeable, trustworthy travel agent.'},
+  tailor:{open:'10:00 AM',close:'8:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Shalwar Kameez','Suits','Bridal Dresses','School Uniforms','Alterations'],pricing:{'Regular Stitching':'1500','Express Stitching':'1700'},catalog:[],faqs:[{q:'Stitching time?',a:'Regular 1 week, Express 3 days with extra Rs 200.'}],persona:'Guide customers like a skilled, detail-oriented tailor.'},
+  tutoring:{open:'2:00 PM',close:'9:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Maths','English','Physics','Chemistry','Computer Science'],pricing:{'One-on-One (per hour)':'1000','Group Session (per hour)':'500'},catalog:[],faqs:[{q:'One-on-one available?',a:'Yes, and small group sessions (max 5 students) too.'}],persona:'Guide customers like an encouraging, patient tutor.'},
   general:{open:'9:00 AM',close:'6:00 PM',days:['Mon','Tue','Wed','Thu','Fri','Sat'],services:['Our Services'],pricing:{},catalog:[],faqs:[{q:'Contact?',a:'Message us on WhatsApp or call.'}],persona:'Be friendly and helpful.'},
 }
 const TYPE_SERVICES = {
@@ -72,9 +76,13 @@ const TYPE_SERVICES = {
   auto:['Engine Service','Oil Change','Tyre Change','AC Repair','Brakes','Denting & Painting','Car Wash'],
   electronics:['Mobile Repair','Laptop Repair','Screen Replace','Battery Replace','Data Recovery'],
   dental:['Checkup','Cleaning','Filling','Extraction','Braces','Root Canal','Eye Checkup','Glasses'],
-  catering:['Wedding Catering','Corporate','Birthday','Dawat Package','BBQ','Dessert Table'],
+  catering:['Wedding Catering','Corporate','Birthday','Banquet Package','BBQ','Dessert Table'],
   shop:['In-Store','Online','Home Delivery','COD','Bulk Orders'],
   academy:['Matric','FSC','English Speaking','Computer Course','IELTS','O-Level','A-Level'],
+  furniture:['Bedroom Sets','Sofas','Office Furniture','Kids Furniture','Custom Orders','Home Delivery'],
+  travel:['Air Tickets','Visa Assistance','Hotel Booking','Tour Packages','Umrah Packages'],
+  tailor:['Shalwar Kameez','Suits','Bridal Dresses','School Uniforms','Alterations','Embroidery'],
+  tutoring:['Maths','English','Physics','Chemistry','Computer Science','One-on-One','Group Sessions'],
   general:['Service 1','Service 2'],
 }
 
@@ -109,7 +117,8 @@ function renderForm(c) {
       ${[['gym','1f3cb-fe0f','Gym'],['salon','1f487','Salon'],['restaurant','1f354','Restaurant'],['clinic','1f3e5','Clinic'],
          ['pharmacy','1f48a','Pharmacy'],['clothing','1f457','Clothing'],['realestate','1f3e0','Real Estate'],
          ['bakery','1f382','Bakery'],['grocery','1f6d2','Grocery'],['auto','1f527','Auto'],['electronics','1f4f1','Electronics'],
-         ['dental','1f9b7','Dental'],['catering','1f37d-fe0f','Catering'],['shop','1f6cd-fe0f','Retail'],['academy','1f4da','Academy'],['general','1f3e2','Other']]
+         ['dental','1f9b7','Dental'],['catering','1f37d-fe0f','Catering'],['shop','1f6cd-fe0f','Retail'],['academy','1f4da','Academy'],
+         ['furniture','1fa91','Furniture'],['travel','2708-fe0f','Travel'],['tailor','1faa1','Tailor'],['tutoring','1f4da','Tutoring'],['general','1f3e2','Other']]
         .map(([k,cp,l])=>`<button type="button" class="type-btn ${c.business_type===k?'active':''}" onclick="selectType('${k}')">${emoji(cp,16)} ${l}</button>`).join('')}
     </div>
 
