@@ -178,8 +178,18 @@ function renderForm(c) {
   rebuildChips(allSvcs, svcs)
   rebuildPriceRows(c.pricing||{})
   ;(Array.isArray(c.catalog)?c.catalog:[]).forEach(i=>addCatalogCard(i.name,i.price,i.desc))
-  const kb = c.knowledge_base||c.faq||''
-  if(kb) { const faqs = kb.split(/Q:/i).filter(Boolean); faqs.forEach(f=>{ const [q,...a]=f.split(/\nA:/i); if(q&&a.length) addFaq(q.trim(), a.join('').trim()) }) }
+  // faq can be a structured [{q,a}] array (Setup Wizard's AI-generated
+  // config) or a free-text "Q: ...\nA: ..." string (manually typed) —
+  // previously only the string form was handled, so any client onboarded
+  // via the wizard saw an empty FAQ section here despite having real
+  // AI-generated FAQs saved (found 2026-07-14 testing the wizard flow
+  // end to end: kb.split threw because kb was an array, not a string).
+  if (Array.isArray(c.faq)) {
+    c.faq.forEach(f => { if (f && f.q) addFaq(f.q, f.a || '') })
+  } else {
+    const kb = c.knowledge_base || c.faq || ''
+    if (kb) { const faqs = kb.split(/Q:/i).filter(Boolean); faqs.forEach(f=>{ const [q,...a]=f.split(/\nA:/i); if(q&&a.length) addFaq(q.trim(), a.join('').trim()) }) }
+  }
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────
