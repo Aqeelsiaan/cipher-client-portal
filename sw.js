@@ -1,5 +1,5 @@
 // CIPHER Service Worker — offline shell + push notifications
-const CACHE = 'cipher-v1'
+const CACHE = 'cipher-v2'
 const SHELL = [
   '/',
   '/index.html',
@@ -7,8 +7,8 @@ const SHELL = [
   '/leads.html',
   '/settings.html',
   '/notifications.html',
-  '/css/app.css',
-  '/js/api.js',
+  '/css/app.css?v=2',
+  '/js/api.js?v=2',
 ]
 
 self.addEventListener('install', e => {
